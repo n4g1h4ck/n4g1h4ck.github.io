@@ -1,0 +1,17 @@
+:root {
+    --primary-color: #161616;
+    --dark-primary-color: #080808;
+    --light-primary-color: #2b2b2b;
+    --secondary-color: #074e6e;
+    --dark-secondary-color: #06364d;
+    --light-secondary-color: #0a82b9;
+    --white-color: #f0f0f0;
+
+    --highlight: #15aff7;
+
+    --dockerlabs: #257ff3;
+    --hackthebox: #19ad19;
+
+    --font1: 'Anonymous Pro', arial, sans-serif;
+    --font2: 'Source Code Pro', arial, sans-serif;
+}

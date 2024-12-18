@@ -1,0 +1,102 @@
+@import url(https://n4g1h4ck.github.io/general.css);
+
+/* ---------- */
+
+body {
+    position: relative;
+    height: 100vh;
+}
+
+footer {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+}
+/* ---------- */
+
+.wrapper {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 230px auto;
+    grid-template-rows: 100% auto;
+    gap: 30px;
+}
+
+.sidebar {
+    background-color: #202020;
+    height: 100%;
+    padding: 15px;
+    border-radius: 0 8px 8px 0;
+    font-family: 'Source Code Pro', monospace, arial, sans-serif;
+    overflow-y: scroll;
+}
+
+.index {
+    text-align: center;
+    color: var(--white-color);
+    font-size: 1.6rem;
+    margin-bottom: 30px;
+}
+
+.dockerlabs, .hackthebox {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin: 15px 0;
+}
+
+.dockerlabs {
+    color: var(--dockerlabs);
+}
+
+.hackthebox {
+    color: var(--hackthebox);
+}
+
+.list_writeups {
+    padding-left: 30px;
+}
+
+.list_writeups li {
+    list-style: none;
+}
+
+.list_writeups li a {
+    display: block;
+    color: #888888;
+}
+
+.content {
+    font-family: 'Montserrat', arial, sans-serif;
+    margin: 10px 0;
+    padding-right: 70px;
+    overflow: hidden;
+}
+
+.content h2.title {
+    font-size: 2.9rem;
+    color: var(--white-color);
+    margin-bottom: 20px;
+}
+
+.footer {
+    background-color: var(--dark-primary-color);
+}
+
+@media screen and (max-width: 750px) {
+    .wrapper {
+        grid-template-columns: auto;
+        grid-template-rows: auto;
+    }
+
+    .content {
+        padding: 20px 30px;
+    }
+
+    .footer {
+        position: static;
+    }
+}
+
+@media screen and (max-width: 380px) {
+    
+}

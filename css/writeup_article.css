@@ -1,0 +1,87 @@
+.writeup_title {
+    font-size: 4rem;
+    font-family: var(--font1);
+    color: var(--white-color);
+    margin-bottom: 5px;
+}
+
+.writeup_title {
+    font-size: 4rem;
+    font-family: var(--font1);
+    color: var(--white-color);
+    margin-bottom: 5px;
+}
+
+.writeup .writeup_subtitle {
+    font-size: 2.5rem;
+    font-family: var(--font2);
+    font-weight: 700;
+    color: var(--light-secondary-color);
+    margin-bottom: 25px;
+}
+
+.writeup .writeup_platform {
+    font-size: 1.6rem;
+    font-family: var(--font2);
+    font-weight: 500;
+    color: var(--secondary-color);
+    margin-bottom: 30px;
+}
+
+.dl {
+    color: var(--dockerlabs);
+}
+
+.htb {
+    color: var(--hackthebox);
+}
+
+.description {
+    margin: 25px 0;
+}
+
+.description:last-child {
+    margin-bottom: 0;
+}
+
+
+.code {
+    border-radius: 5px;
+}
+
+.code_oneliner {
+    overflow-x: scroll;
+}
+
+.footer {
+    position: static;
+}
+
+.description > .language-c, br > .language-c {
+    font-size: 18px;
+}
+
+img {
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+}
+
+i.highlight {
+    display: inline;
+}
+
+@media screen and (max-width: 360px) {
+    .writeup_title {
+        font-size: 3rem;
+    }
+
+    .writeup .writeup_subtitle {
+        font-size: 1.9rem;
+    }
+
+    .writeup .writeup_platform {
+        font-size: 1.4rem;
+        margin-bottom: 10px;
+    }
+}
