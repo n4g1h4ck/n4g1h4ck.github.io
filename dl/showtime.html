@@ -38,28 +38,28 @@
                 <h2 class="writeup_platform">Plataforma: <span class="dl">Dockerlabs</span></h2>
                 <h3 class="writeup_subtitle">Fase de Reconocimiento</h3>
                 <p class="description">
-                    Empezamos enviando una traza ICMP a la máquina para comprobar que tenemos conectividad.
+                    Primero enviamos un <i>ping</i> a la máquina para saber si tenemos conectividad.
                 </p>
                 <pre class="code"><code class="language-ruby">$ ping -c 1 172.17.0.2
 
 PING 172.17.0.2 (172.17.0.2) 56(84) bytes of data.
-64 bytes from 172.17.0.2: icmp_seq=1 ttl=64 time=0.164 ms
+64 bytes from 172.17.0.2: icmp_seq=1 ttl=64 time=0.139 ms
 
 --- 172.17.0.2 ping statistics ---
 1 packets transmitted, 1 received, 0% packet loss, time 0ms
-rtt min/avg/max/mdev = 0.164/0.164/0.164/0.000 ms</code></pre>
+rtt min/avg/max/mdev = 0.139/0.139/0.139/0.000 ms</code></pre>
                 <p class="description">
-                    En base al <span class="highlight">ttl</span> nos damos cuenta que la máquina es una <b>Linux</b>, ya que normalmente un ttl de 64 = Linux y un ttl 128 = Windows (<i>aunque este valor se puede cambiar</i>)
+                    Gracias al <span class="highlight">ttl</span> nos podemos dar cuenta que la máquina es una <b>Linux</b>, ya que usualmente un ttl de 64 = Linux y un ttl 128 = Windows (<i>aunque tambien debemos tener en cuenta que este valor se puede cambiar</i>)
                 </p>
                 <p class="description">
-                    Con <span class="highlight">nmap</span> escaneamos los puertos abiertos de la máquina víctima de la siguiente manera:
+                    Utilizando <span class="highlight">nmap</span> escaneamos los puertos abiertos de la máquina víctima:
                 </p>
                 <pre class="code"><code class="language-ruby">nmap -p- --open --min-rate 5000 -sS -n -Pn -vvv 172.17.0.2 -oG allPorts</code></pre>
                 <p class="description">
                     Con el parámetro <code class="language-ruby">-p-</code> le indicamos que queremos escanear todo el rango de puertos (<i>del 1 al 65535</i>).
                     <br>
                     <br>
-                    Como queremos que nos reporte solo los puertos abierto le ponemos el <code class="language-ruby">--open</code>
+                    Como queremos que nos reporte solo los puertos abiertos le ponemos el <code class="language-ruby">--open</code>
                     <br>
                     <br>
                     El <code class="language-ruby">--min-rate 5000</code> es para decirle que queremos enviar paquetes no mas lentos que 5000 paquetes por segundo.
@@ -75,65 +75,41 @@ rtt min/avg/max/mdev = 0.164/0.164/0.164/0.000 ms</code></pre>
                     <br><br>
                     Y por último, con el parámetro <code class="language-ruby">-oG allPorts</code> le indicamos que queremos exportar la evidencia en un formato grepeable al archivo <i>allPorts</i>, para que mas adelante con la herramienta <b>extractPorts</b> nos copie los puertos en la clipboard.
                 </p>
-                <p class="description">El output de este escaneo se vería algo así:</p>
-                <pre class="code"><code class="language-ruby">Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-12-16 10:10 -04
-Initiating ARP Ping Scan at 10:10
-Scanning 172.17.0.2 [1 port]
-Completed ARP Ping Scan at 10:10, 0.04s elapsed (1 total hosts)
-Initiating SYN Stealth Scan at 10:10
-Scanning 172.17.0.2 [65535 ports]
-Discovered open port 22/tcp on 172.17.0.2
-Discovered open port 80/tcp on 172.17.0.2
-Discovered open port 53/tcp on 172.17.0.2
-Completed SYN Stealth Scan at 10:10, 0.73s elapsed (65535 total ports)
-Nmap scan report for 172.17.0.2
-Host is up, received arp-response (0.0000040s latency).
-Scanned at 2024-12-16 10:10:29 -04 for 0s
-Not shown: 65532 closed tcp ports (reset)
-PORT   STATE SERVICE REASON
-22/tcp open  ssh     syn-ack ttl 64
-53/tcp open  domain  syn-ack ttl 64
-80/tcp open  http    syn-ack ttl 64
-MAC Address: 02:42:AC:11:00:02 (Unknown)
-
-Read data files from: /usr/bin/../share/nmap
-Nmap done: 1 IP address (1 host up) scanned in 0.98 seconds
-           Raw packets sent: 65536 (2.884MB) | Rcvd: 65536 (2.621MB)</code></pre>
-                <p class="description">Ahora realizo un escaneo de puertos mas exaustivo, tal que así:</p>
-                <pre class="code"><code class="language-ruby">nmap -sCV -p22,53,80 172.17.0.2 -oN targeted</code></pre>
+                <p class="description">Si esperamos a que finalice el escaneo y hacemos un <span class="highlight">cat</span> al archivo <i>allPorts</i> este nos debería mostrar algo así:</p>
+                <pre class="code"><code class="language-text"># Nmap 7.94SVN scan initiated Tue Dec 17 12:51:32 2024 as: nmap -p- --open -sS --min-rate 5000 -Pn -n -vvv -oG allPorts 172.17.0.2
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 172.17.0.2 ()	Status: Up
+Host: 172.17.0.2 ()	Ports: 22/open/tcp//ssh///, 80/open/tcp//http///	Ignored State: closed (65533)
+# Nmap done at Tue Dec 17 12:51:33 2024 -- 1 IP address (1 host up) scanned in 1.09 seconds</code></pre>
+                <p class="descriptioin">Se ve feo pero el objetivo de esto es que si hacemos un <code class="language-ruby">extractPorts allPorts</code> nos debería de haber copiado los puertos en la clipboard</p>
+                <p class="description">Luego de esto, con Ctrl+shift+v copio los puertos y realizo un escaneo más a fondo:</p>
+                <pre class="code"><code class="language-ruby">nmap -sCV -p22,80 172.17.0.2 -oN targeted</code></pre>
                 <p class="description">
                     Con el parámetro <code class="language-ruby">-sCV</code> le indico a nmap que quiero que aplique algunos <i>scripts de reconocimiento</i> y me detecte las versiones y servicios que emplean cada uno de los puertos.
                     <br><br>
-                    Con <code class="language-ruby">-p22,53,80</code> le indico los puertos.
+                    Con <code class="language-ruby">-p22,80</code> le indico los puertos.
                     Y al final, con el parámetros <code class="language-ruby">-oN targeted</code> le digo a nmap que me exporte la evidencia tal cual me la muestra por consola al archivo <i>targeted</i>.
                 </p>
-                <p class="description">El output sería:</p>
-                <pre class="code"><code class="language-ruby">Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-12-16 11:22 -04
+                <p class="description">El output se vería algo así:</p>
+                <pre class="code"><code class="language-ruby"># Nmap 7.94SVN scan initiated Tue Dec 17 12:51:43 2024 as: nmap -sCV -p22,80 -oN targeted 172.17.0.2
 Nmap scan report for hackzones.hl (172.17.0.2)
-Host is up (0.000041s latency).
+Host is up (0.000037s latency).
 
 PORT   STATE SERVICE VERSION
-22/tcp open  ssh     OpenSSH 9.6p1 Ubuntu 3ubuntu13.5 (Ubuntu Linux; protocol 2.0)
+22/tcp open  ssh     OpenSSH 9.6p1 Ubuntu 3ubuntu13.4 (Ubuntu Linux; protocol 2.0)
 | ssh-hostkey: 
-|   256 8e:a2:56:38:e1:85:2f:21:2b:55:ec:29:5b:f8:63:d9 (ECDSA)
-|_  256 0f:4b:38:fa:04:33:c7:01:5a:98:12:05:2d:42:cf:1a (ED25519)
-53/tcp open  domain  ISC BIND 9.18.28-0ubuntu0.24.04.1 (Ubuntu Linux)
-| dns-nsid: 
-|_  bind.version: 9.18.28-0ubuntu0.24.04.1-Ubuntu
+|   256 e1:9a:9f:b3:17:be:3d:2e:12:05:0f:a4:61:c3:b3:76 (ECDSA)
+|_  256 69:8f:5c:4f:14:b0:4d:b6:b7:59:34:4d:b9:03:40:75 (ED25519)
 80/tcp open  http    Apache httpd 2.4.58 ((Ubuntu))
-|_http-title: DNS Secure Login
+|_http-title: cs
 |_http-server-header: Apache/2.4.58 (Ubuntu)
 MAC Address: 02:42:AC:11:00:02 (Unknown)
 Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 
 Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
-Nmap done: 1 IP address (1 host up) scanned in 15.02 seconds</code></pre>
+# Nmap done at Tue Dec 17 12:51:50 2024 -- 1 IP address (1 host up) scanned in 7.75 seconds</code></pre>
                 <p class="description">
-                    Como esta el puerto <i>80 http</i> abierto, ejecuto un <code class="language-ruby">whatweb http://172.17.0.2</code> y esto nos responde con:
-                </p>
-                <pre class="code code_oneliner"><code class="language-ruby">http://172.17.0.2 [200 OK] Apache[2.4.58], Country[RESERVED][ZZ], HTML5,HTTPServer[Ubuntu Linux][Apache/2.4.58 (Ubuntu)], IP[172.17.0.2], Title[HackZones.hl - Seguridad para tu Empresa]</code></pre>
-                <p class="description">
-                    Ahora abro en el navegador el servicio http y muestra este sitio web:
+                    En el navegador abro el servicio http y muestra este sitio web:
                     <br><br>
                     <img src="https://n4g1h4ck.github.io/images/DL/hackzones.png" alt="hackzones web">
                     <br><br>
