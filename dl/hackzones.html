@@ -135,7 +135,7 @@ Nmap done: 1 IP address (1 host up) scanned in 15.02 seconds</code></pre>
                 <p class="description">
                     Ahora abro en el navegador el servicio http y muestra este sitio web:
                     <br><br>
-                    <img src="https://n4g1h4ck.github.io/images/dl/hackzones/hackzones.png" alt="hackzones web">
+                    <img src="https://n4g1h4ck.github.io/images/DL/hackzones/hackzones.png" alt="hackzones web">
                     <br><br>
                     Seguro te habras dado cuenta que la página expone un dominio (hackzones.hl), pero si intentamos abrirlo en el navegador este no lo reconocerá, ya que posiblemente se estara empleando <i>virtual hosting</i>, y de ser cierto, puede que nos muestre algo diferente a la web original. Entonces para que nos resuelva el dominio debemos añadirlo al <i>/etc/hosts</i>
                 </p>
@@ -150,7 +150,7 @@ ff02::2    ip6-allrouters
                 <p class="description">
                     Ahora si lo abrimos en el navegador, nos dirige a la siguiente web:
                     <br><br>
-                    <img src="https://n4g1h4ck.github.io/images/dl/hackzones/hackzones2.png" alt="hackzones.hl">
+                    <img src="https://n4g1h4ck.github.io/images/DL/hackzones/hackzones2.png" alt="hackzones.hl">
                     <br><br>
                     Probé credenciales comunes, la típica <i>admin</i> y <i>admin</i> y <i>ataques de injección sql</i> pero no funcionó.
                 </p>
@@ -183,22 +183,22 @@ ff02::2    ip6-allrouters
                 <p class="description">
                     El <i>index.html</i> es la página por defecto y si entramos a <i>dashboard.html</i> nos encontramos con un dashboard y si vemos bien, nos damos cuenta que somos el usuario <i>admin</i> (obviamente esta web esta mal hecha por esta parte).
                     <br><br>
-                    <img src="https://n4g1h4ck.github.io/images/dl/hackzones/hackzones3.png" alt="hackzones dashboard">
+                    <img src="https://n4g1h4ck.github.io/images/DL/hackzones/hackzones3.png" alt="hackzones dashboard">
                     <br><br>
                     Si presionamos en el boton circular que dice admin, nos aparece una ventana donde podemos subir una foto de perfil.
                     <br><br>
-                    <img src="https://n4g1h4ck.github.io/images/dl/hackzones/hackzones4.png" alt="hackzones dashboard2">
+                    <img src="https://n4g1h4ck.github.io/images/DL/hackzones/hackzones4.png" alt="hackzones dashboard2">
                     <br><br>
                     En este caso intentaremos subir un archivo que NO sea una imagen para ver si tenemos capacidad de subir lo que queramos y con ello obtener un <span class="highlight">RCE</span> (<i>Remote Comand Execution</i>).
                 </p>
                 <p class="description">
                     A modo de prueba, subiré un <i>archivo.txt</i> para ver que me responde.
                     <br><br>
-                    <img src="https://n4g1h4ck.github.io/images/dl/hackzones/hackzones5.png" alt="hackzones">
+                    <img src="https://n4g1h4ck.github.io/images/DL/hackzones/hackzones5.png" alt="hackzones">
                     <br><br>
                     Podemos ver que el archivo se subió sin ningún problema. Revisamos en la direccion <i>http://hackzones.hl/uploads/</i> y nos aparece el archivo, lo abrimos y nos muestra el contenido.
                     <br><br>
-                    <img src="https://n4g1h4ck.github.io/images/dl/hackzones/hackzones6.png" alt="hackzones">
+                    <img src="https://n4g1h4ck.github.io/images/DL/hackzones/hackzones6.png" alt="hackzones">
                     <br><br>
                     Entonces, al ver en el <i>Wappalyzer</i> que la web interpreta código php, procederé a subir un script php que al abrirlo ejecuta un <i>oneliner en bash</i> que nos da una <i class="highlight">Reverse Shell</i> a nuestra máquina atacante.
                 </p>
@@ -210,7 +210,7 @@ ff02::2    ip6-allrouters
                 <p class="description">
                     Lo abrimos y obtenemos la <i>Reverse Shell</i>.
                     <br><br>
-                    <img src="https://n4g1h4ck.github.io/images/dl/hackzones/hackzones7.png" alt="">
+                    <img src="https://n4g1h4ck.github.io/images/DL/hackzones/hackzones7.png" alt="">
                 </p>
                 <h3 class="writeup_subtitle">Tratamiento de la tty</h3>
                 <p class="description">Empezamos dándonos una <i>pseudoconsola</i></p>
@@ -222,7 +222,7 @@ ff02::2    ip6-allrouters
                 <pre class="code"><code class="language-ruby">reset xterm</code></pre>
                 <p class="description">Y presionamos enter, esto se vería así:</p>
                 <br><br>
-                <img src="https://n4g1h4ck.github.io/images/dl/hackzones/hackzones8.png" alt="hackzones">
+                <img src="https://n4g1h4ck.github.io/images/DL/hackzones/hackzones8.png" alt="hackzones">
                 <br><br>
                 <p class="description">Ahora podemos ejecutar Ctrl+c sin que afecte a la terminal, para ejecutar <i>Ctrl+l</i> y se nos limpie la pantalla debemos ejecutar <span class="highlight">export TERM=xterm</span> y ahora debería funcionar</p>
                 <p class="description">
@@ -280,10 +280,10 @@ echo -e "${p1}${p2}${p3}${p4}"</code></pre>
 
                 <p class="description">Como tenemos una contraseña, intentaremos probarla con el usuario <i>mrrobot</i> y vemos que funciona.</p>
                 <p class="description">Si ejecutamos <i>sudo -l</i> vemos que podemos ejecutar <i class="highlight">cat</i> como cualquier usuario y sin proporcionar contraseña</p>
-                <img src="https://n4g1h4ck.github.io/images/dl/hackzones/hackzones9.png" alt="hackzones">
+                <img src="https://n4g1h4ck.github.io/images/DL/hackzones/hackzones9.png" alt="hackzones">
                 <p class="description">Si seguimos buscando, nos daremos cuenta que en la ruta <i>/opt</i> existe un archivo llamado <i>SistemUpdate</i> el cual no tenemos capacidad de lectura, entonces, ya que podemos utilizar <i class="highlight">cat</i> como <i>root</i> lo ejecutaremos con el archivo.
                 <br><br>
-                <img src="https://n4g1h4ck.github.io/images/dl/hackzones/hackzones10.png" alt="hackzones">
+                <img src="https://n4g1h4ck.github.io/images/DL/hackzones/hackzones10.png" alt="hackzones">
                 <br><br>
                 Vemos en la respuesta una linea interesante que dice <i class="highlight">"Extracting user root:rooteable from packages: 50%"</i> donde podemos pensar que la contraseña para el usuario <i>root</i> es <i>"rooteable"</i>, ejecutamos <code class="language-ruby">su root</code> y escribimos <i>rooteable</i> y vemos que al final si era su contraseña.
             </article>
