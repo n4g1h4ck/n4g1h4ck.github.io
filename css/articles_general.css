@@ -52,18 +52,18 @@ footer {
     color: var(--hackthebox);
 }
 
-.list_sidebar {
+.list_articles {
     display: flex;
     flex-direction: column;
     gap: 10px;
     padding-left: 30px;
 }
 
-.list_sidebar li {
+.list_articles li {
     list-style: none;
 }
 
-.list_sidebar li a {
+.list_articles li a {
     color: #888888;
 }
 
