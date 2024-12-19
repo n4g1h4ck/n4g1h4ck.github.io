@@ -56,15 +56,18 @@ footer {
     color: var(--secondary-color);
 }
 
-.list_writeups {
+.list_sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
     padding-left: 30px;
 }
 
-.list_writeups li {
+.list_sidebar li {
     list-style: none;
 }
 
-.list_writeups li a {
+.list_sidebar li a {
     display: block;
     color: #888888;
 }
